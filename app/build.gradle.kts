@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -34,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.firestore)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
 

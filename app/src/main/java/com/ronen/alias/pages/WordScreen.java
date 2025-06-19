@@ -1,13 +1,19 @@
-package com.ronen.alias;
+package com.ronen.alias.pages;
 
+import static com.ronen.alias.util.Util.beep;
+import static com.ronen.alias.util.Util.tick;
+
+import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.media.Image;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +23,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ronen.alias.util.DataBase;
+import com.ronen.alias.util.ListAdapter;
+import com.ronen.alias.R;
+import com.ronen.alias.util.Util;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class WordScreen extends AppCompatActivity {
@@ -26,7 +36,7 @@ public class WordScreen extends AppCompatActivity {
 	TextView word;
     TextView amount;
     TextView timer;
-    Button back;
+    ImageButton back;
 
     int correct;
     int wrong;
@@ -53,24 +63,35 @@ public class WordScreen extends AppCompatActivity {
             return insets;
         });
 
+        Util.context = this;
+
+        correct = 0;
+        wrong = 0;
+
 	    word = findViewById(R.id.text);
         timer = findViewById(R.id.timer);
         amount = findViewById(R.id.amount);
         back = findViewById(R.id.back);
 
-        back.setOnClickListener(v -> Util.switchActivities(StartScreen.class, this));
+        word.setTextColor(Util.resolveAttrColor());
+
+
+        back.setOnClickListener(v -> {
+            DataBase.setGuesser(false);
+            Util.switchActivities(StartScreen.class);
+        });
         back.setVisibility(View.GONE);
-
-        correct = -1;
-        wrong = 0;
-
-        context = this;
 
         findViewById(R.id.next).setOnClickListener(v -> guess(true));
         findViewById(R.id.skip).setOnClickListener(v -> guess(false));
 
         timeleft = 60 * 1000;
-        final int timerSpeed = 1000;
+
+        DataBase.getStart(v -> {
+            timeleft = 60 * 1000 - (int)(System.currentTimeMillis() - v);
+        });
+
+        final int timerSpeed = 100;
 
          timerRunnable = new Runnable() {
             @Override
@@ -78,12 +99,18 @@ public class WordScreen extends AppCompatActivity {
                 timeleft -= timerSpeed;
 
                 if (timeleft <= 0){
+                    tick.stop();
+                    beep.start();
+                    timer.setTextColor(Color.rgb(255, 0, 0));
                     timer.setText("Out of time!");
                     back.setVisibility(View.VISIBLE);
-                    Util.vibrate(500, context);
+                    Util.vibrate(1000);
                     handler.removeCallbacks(timerRunnable);
                     return;
                 }
+
+                if (timeleft <= 8000 && !tick.isPlaying())
+                    tick.start();
 
                 int seconds = timeleft / 1000;
                 if (seconds > 30)
@@ -103,24 +130,26 @@ public class WordScreen extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ListAdapter(data, false, v -> {});
+        adapter = new ListAdapter(data, true, v -> DataBase.putData("badwords", v, true));
         recyclerView.setAdapter(adapter);
 
-        guess(true);
-
         handler.post(timerRunnable);
+
+        showWord();
+        updateAmount();
+
+        DataBase.getAmount(r -> {
+            correct = r[0];
+            wrong = r[1];
+            updateAmount();
+        });
     }
 
     public static List<String> words;
 
-    private void guess(boolean right){
+    public void updateAmount(){
         if (timeleft <= 0)
             return;
-
-        if (right)
-            correct++;
-        else
-            wrong++;
 
         String text = "+ " + correct + " | - " + wrong;
         SpannableString styledText = new SpannableString(text);
@@ -147,13 +176,26 @@ public class WordScreen extends AppCompatActivity {
         );
 
         runOnUiThread(() -> amount.setText(styledText));
+    }
+
+    private void guess(boolean right){
+        if (timeleft <= 0)
+            return;
+
+        if (right)
+            DataBase.putData("game", "correct", ++correct);
+        else
+            DataBase.putData("game", "wrong", ++wrong);
+
+        updateAmount();
 
         showWord();
     }
 
     private void showWord(){
         if (words == null || words.isEmpty()){
-            Util.switchActivities(StartScreen.class, this);
+            DataBase.setGuesser(false);
+            Util.switchActivities(StartScreen.class);
             return;
         }
         int loc = (int)(Math.random()*words.size());
@@ -170,5 +212,11 @@ public class WordScreen extends AppCompatActivity {
         super.onDestroy();
         handler.removeCallbacks(timerRunnable);
     }
+
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed() {
+    }
+
 
 }

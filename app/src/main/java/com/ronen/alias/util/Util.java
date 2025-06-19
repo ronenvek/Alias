@@ -1,29 +1,43 @@
-package com.ronen.alias;
+package com.ronen.alias.util;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
-import android.widget.Toast;
+
+import com.ronen.alias.R;
 
 public class Util {
 
-    public static void switchActivities(Object page, Context context) {
+    public static Context context;
+
+    public static MediaPlayer tick;
+    public static MediaPlayer beep;
+
+    public static void setupSounds(){
+        if (tick == null)
+            tick = MediaPlayer.create(context, R.raw.tick);
+
+        if (beep == null)
+            beep = MediaPlayer.create(context, R.raw.goodbeep);
+    }
+
+    public static void switchActivities(Object page) {
+        if (page.toString().equals(context.getClass().toString()))
+            return;
         Intent switchActivityIntent = new Intent(context, (Class<?>) page);
         context.startActivity(switchActivityIntent);
     }
 
-    public static int resolveAttrColor(Context context) {
+    public static int resolveAttrColor() {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true);
         return typedValue.data;
     }
 
-    public static void vibrate(int duration, Context context) {
+    public static void vibrate(int duration) {
         Vibrator vibrator = context.getSystemService(Vibrator.class);
         if (vibrator != null && vibrator.hasVibrator()) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

@@ -1,4 +1,4 @@
-package com.ronen.alias;
+package com.ronen.alias.util;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,11 +11,7 @@ public class WebsiteInfo {
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public interface ResultCallback{
-        void onCallback(String result);
-    }
-
-    public static void getWebsiteInfo(String url, ResultCallback callback) {
+    public static void getWebsiteInfo(String url, ResultCallback<String> callback) {
         executor.execute(() -> {
             final StringBuilder builder = new StringBuilder();
 

@@ -1,4 +1,4 @@
-package com.ronen.alias;
+package com.ronen.alias.util;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+
+import com.ronen.alias.R;
 
 import java.util.List;
 
@@ -73,10 +75,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             show = text.substring(0, text.length() - 8);
         if (isButton) {
             holder.button.setText(show);
-            holder.button.setTextColor(Util.resolveAttrColor(holder.view.getContext()));
+            holder.button.setTextColor(Util.resolveAttrColor());
         } else {
             holder.textView.setText(show);
-            holder.textView.setTextColor(Util.resolveAttrColor(holder.view.getContext()));
+            holder.textView.setTextColor(Util.resolveAttrColor());
         }
 
     }

@@ -17,7 +17,7 @@
         android:theme="@style/Theme.Alias"
         tools:targetApi="31">
         <activity
-            android:name=".WordScreen"
+            android:name=".pages.WordScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,12 +26,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".StartScreen"
+            android:name=".pages.StartScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".pages.GuessScreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.TAB" />
             </intent-filter>
         </activity>
     </application>

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WordScreen"
+    tools:context=".pages.WordScreen"
     android:fitsSystemWindows="true">
 
 
@@ -22,25 +22,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/next"
-        android:layout_width="110dp"
-        android:layout_height="55dp"
-        android:text="Next"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/check"
+        android:backgroundTint="@null"
+        android:stateListAnimator="@null"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/skip"
         app:layout_constraintTop_toBottomOf="@id/text" />
 
-    <Button
+
+    <ImageButton
         android:id="@+id/skip"
-        android:layout_width="110dp"
-        android:layout_height="55dp"
-        android:text="Skip"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/x"
+        android:backgroundTint="@null"
+        android:stateListAnimator="@null"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/next"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text" />
+        app:layout_constraintTop_toBottomOf="@id/text"
+        app:layout_constraintVertical_bias="0.504" />
 
     <TextView
         android:id="@+id/timer"
@@ -66,11 +76,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="back" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@null"
+        android:scaleType="fitXY"
+        android:src="@android:drawable/ic_menu_revert"
+        android:stateListAnimator="@null" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
