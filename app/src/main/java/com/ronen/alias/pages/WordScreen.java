@@ -30,6 +30,7 @@ import com.ronen.alias.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WordScreen extends AppCompatActivity {
 
@@ -78,20 +79,21 @@ public class WordScreen extends AppCompatActivity {
 
         back.setOnClickListener(v -> {
             DataBase.setGuesser(false);
+            handler.removeCallbacks(timerRunnable);
             Util.switchActivities(StartScreen.class);
         });
-        back.setVisibility(View.GONE);
 
         findViewById(R.id.next).setOnClickListener(v -> guess(true));
         findViewById(R.id.skip).setOnClickListener(v -> guess(false));
 
-        timeleft = 60 * 1000;
+        timeleft = 12 * 1000;
 
         DataBase.getStart(v -> {
-            timeleft = 60 * 1000 - (int)(System.currentTimeMillis() - v);
+            timeleft = 12 * 1000 - (int)(System.currentTimeMillis() - v);
         });
 
         final int timerSpeed = 100;
+        final boolean[] running = {false};
 
          timerRunnable = new Runnable() {
             @Override
@@ -103,14 +105,15 @@ public class WordScreen extends AppCompatActivity {
                     beep.start();
                     timer.setTextColor(Color.rgb(255, 0, 0));
                     timer.setText("Out of time!");
-                    back.setVisibility(View.VISIBLE);
                     Util.vibrate(1000);
                     handler.removeCallbacks(timerRunnable);
                     return;
                 }
 
-                if (timeleft <= 8000 && !tick.isPlaying())
+                if (timeleft <= 8000 && !running[0]){
                     tick.start();
+                    running[0] = true;
+                }
 
                 int seconds = timeleft / 1000;
                 if (seconds > 30)
@@ -199,8 +202,8 @@ public class WordScreen extends AppCompatActivity {
             return;
         }
         int loc = (int)(Math.random()*words.size());
+        String newWord = words.remove(loc);
         runOnUiThread(() -> {
-            String newWord = words.remove(loc);
             word.setText(newWord);
             data.add(newWord);
             adapter.notifyDataSetChanged();

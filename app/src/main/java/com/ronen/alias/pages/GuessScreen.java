@@ -55,6 +55,7 @@ public class GuessScreen extends AppCompatActivity {
 
         back.setOnClickListener(v -> {
             DataBase.setGuesser(false);
+            handler.removeCallbacks(timerRunnable);
             Util.switchActivities(StartScreen.class);
         });
 
@@ -68,6 +69,8 @@ public class GuessScreen extends AppCompatActivity {
         });
 
         final int timerSpeed = 100;
+
+        final boolean[] running = {false};
 
         timerRunnable = new Runnable() {
             @Override
@@ -86,9 +89,10 @@ public class GuessScreen extends AppCompatActivity {
                     handler.removeCallbacks(timerRunnable);
                     return;
                 }
-
-                if (timeleft <= 9000 && !tick.isPlaying())
+                if (timeleft <= 8000 && !running[0]){
                     tick.start();
+                    running[0] = true;
+                }
 
                 int seconds = timeleft / 1000;
                 if (seconds > 30)

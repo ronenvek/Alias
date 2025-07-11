@@ -84,6 +84,8 @@
         android:backgroundTint="@null"
         android:scaleType="fitXY"
         android:src="@android:drawable/ic_menu_revert"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:stateListAnimator="@null" />
 
 
@@ -93,7 +95,8 @@
         android:layout_height="218dp"
         android:padding="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
