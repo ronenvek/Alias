@@ -1,9 +1,8 @@
 package com.ronen.alias.pages;
 
-import static com.ronen.alias.util.Util.beep;
-import static com.ronen.alias.util.Util.tick;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -21,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.ronen.alias.R;
 import com.ronen.alias.util.DataBase;
+import com.ronen.alias.util.SoundHelper;
 import com.ronen.alias.util.Util;
 
 
@@ -55,8 +55,8 @@ public class GuessScreen extends AppCompatActivity {
 
         back.setOnClickListener(v -> {
             DataBase.setGuesser(false);
-            handler.removeCallbacks(timerRunnable);
             Util.switchActivities(StartScreen.class);
+            stop();
         });
 
         timeleft = 60 * 1000;
@@ -70,28 +70,37 @@ public class GuessScreen extends AppCompatActivity {
 
         final int timerSpeed = 100;
 
-        final boolean[] running = {false};
+        toStop = false;
+
+        Context ctx = this;
 
         timerRunnable = new Runnable() {
             @Override
             public void run() {
+
+                if (toStop || !Util.context.equals(ctx)){
+                    handler.removeCallbacks(timerRunnable);
+                    return;
+                }
+
                 timeleft -= timerSpeed;
 
                 if (timeleft <= -10 * 1000)
                     back.setVisibility(View.VISIBLE);
 
                 if (timeleft <= 0){
-                    tick.stop();
-                    beep.start();
+                    SoundHelper.playBeep();
                     timer.setTextColor(Color.rgb(255, 0, 0));
                     timer.setText("Out of time!");
                     Util.vibrate(1000);
                     handler.removeCallbacks(timerRunnable);
                     return;
                 }
-                if (timeleft <= 8000 && !running[0]){
-                    tick.start();
-                    running[0] = true;
+
+                if (timeleft <= 8000){
+                    if (timeleft % 1000 < timerSpeed) {
+                        SoundHelper.playTick();
+                    }
                 }
 
                 int seconds = timeleft / 1000;
@@ -114,6 +123,8 @@ public class GuessScreen extends AppCompatActivity {
 
         handler.post(timerRunnable);
     }
+
+
 
     public void updateAmount(int correct, int wrong){
         if (timeleft <= 0)
@@ -144,6 +155,18 @@ public class GuessScreen extends AppCompatActivity {
         );
 
         runOnUiThread(() -> amount.setText(styledText));
+    }
+
+    private boolean toStop = false;
+    void stop(){
+        toStop = true;
+        handler.removeCallbacks(timerRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stop();
     }
 
     @SuppressLint("MissingSuperCall")

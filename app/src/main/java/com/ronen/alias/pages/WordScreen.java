@@ -1,9 +1,7 @@
 package com.ronen.alias.pages;
 
-import static com.ronen.alias.util.Util.beep;
-import static com.ronen.alias.util.Util.tick;
-
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.media.Image;
 import android.media.MediaPlayer;
@@ -26,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ronen.alias.util.DataBase;
 import com.ronen.alias.util.ListAdapter;
 import com.ronen.alias.R;
+import com.ronen.alias.util.SoundHelper;
 import com.ronen.alias.util.Util;
 
 import java.util.ArrayList;
@@ -50,8 +49,6 @@ public class WordScreen extends AppCompatActivity {
     RecyclerView recyclerView;
     ListAdapter adapter;
     List<String> data = new ArrayList<>();
-
-    WordScreen context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,30 +76,35 @@ public class WordScreen extends AppCompatActivity {
 
         back.setOnClickListener(v -> {
             DataBase.setGuesser(false);
-            handler.removeCallbacks(timerRunnable);
             Util.switchActivities(StartScreen.class);
+            stop();
         });
 
         findViewById(R.id.next).setOnClickListener(v -> guess(true));
         findViewById(R.id.skip).setOnClickListener(v -> guess(false));
 
-        timeleft = 12 * 1000;
+        timeleft = 60 * 1000;
 
         DataBase.getStart(v -> {
-            timeleft = 12 * 1000 - (int)(System.currentTimeMillis() - v);
+            timeleft = 60 * 1000 - (int)(System.currentTimeMillis() - v);
         });
 
         final int timerSpeed = 100;
-        final boolean[] running = {false};
+        toStop = false;
+
+        Context ctx = this;
 
          timerRunnable = new Runnable() {
             @Override
             public void run() {
+                if (toStop || !Util.context.equals(ctx)){
+                    handler.removeCallbacks(timerRunnable);
+                    return;
+                }
                 timeleft -= timerSpeed;
 
                 if (timeleft <= 0){
-                    tick.stop();
-                    beep.start();
+                    SoundHelper.playBeep();
                     timer.setTextColor(Color.rgb(255, 0, 0));
                     timer.setText("Out of time!");
                     Util.vibrate(1000);
@@ -110,9 +112,10 @@ public class WordScreen extends AppCompatActivity {
                     return;
                 }
 
-                if (timeleft <= 8000 && !running[0]){
-                    tick.start();
-                    running[0] = true;
+                if (timeleft <= 8000){
+                    if (timeleft % 1000 < timerSpeed) {
+                        SoundHelper.playTick();
+                    }
                 }
 
                 int seconds = timeleft / 1000;
@@ -125,7 +128,6 @@ public class WordScreen extends AppCompatActivity {
                 else
                     timer.setTextColor(Color.rgb(255, 0, 0));
                 timer.setText(String.valueOf(seconds));
-
                 handler.postDelayed(this, timerSpeed);
             }
          };
@@ -210,10 +212,16 @@ public class WordScreen extends AppCompatActivity {
         });
     }
 
+    private boolean toStop = false;
+    void stop(){
+        toStop = true;
+        handler.removeCallbacks(timerRunnable);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(timerRunnable);
+        stop();
     }
 
     @SuppressLint("MissingSuperCall")

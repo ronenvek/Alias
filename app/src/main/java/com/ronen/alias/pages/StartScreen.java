@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.ronen.alias.R;
 import com.ronen.alias.util.DataBase;
 import com.ronen.alias.util.Preferences;
+import com.ronen.alias.util.SoundHelper;
 import com.ronen.alias.util.Util;
 import com.ronen.alias.util.WebsiteInfo;
 
@@ -44,7 +45,8 @@ public class StartScreen extends AppCompatActivity {
         });
 
         Util.context = this;
-        Util.setupSounds();
+
+        SoundHelper.initSoundPool(this);
 
         start = findViewById(R.id.start);
 

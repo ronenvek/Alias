@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.TypedValue;
 
 import com.ronen.alias.R;
@@ -12,17 +13,6 @@ import com.ronen.alias.R;
 public class Util {
 
     public static Context context;
-
-    public static MediaPlayer tick;
-    public static MediaPlayer beep;
-
-    public static void setupSounds(){
-        if (tick == null)
-            tick = MediaPlayer.create(context, R.raw.tick);
-
-        if (beep == null)
-            beep = MediaPlayer.create(context, R.raw.goodbeep);
-    }
 
     public static void switchActivities(Object page) {
         if (page.toString().equals(context.getClass().toString()))
