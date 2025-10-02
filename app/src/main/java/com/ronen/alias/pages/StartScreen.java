@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -18,8 +17,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.ronen.alias.R;
-import com.ronen.alias.util.DataBase;
-import com.ronen.alias.util.Preferences;
 import com.ronen.alias.util.SoundHelper;
 import com.ronen.alias.util.Util;
 import com.ronen.alias.util.WebsiteInfo;
@@ -32,6 +29,7 @@ import java.util.UUID;
 public class StartScreen extends AppCompatActivity {
 
     Button start;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,32 +50,17 @@ public class StartScreen extends AppCompatActivity {
 
         start.setOnClickListener(null);
 
-        String id = Preferences.getPrefs().getString("id", null);
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-            Preferences.getEditor().putString("id", id);
-            Preferences.save();
-        }
-
-        DataBase.setup();
 
         if (words == null || words.isEmpty())
             updateList();
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            DataBase.listenForUpdates();
 
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                start.setOnClickListener(v -> {
-                    if (words == null || words.isEmpty())
-                        return;
-                    DataBase.setGuesser(true);
-                    Util.switchActivities(WordScreen.class);
-                });
-            }, 500);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> start.setOnClickListener(v -> {
+            if (words == null || words.isEmpty())
+                return;
+            Util.switchActivities(WordScreen.class);
+        }), 500);
 
-
-        }, 1000);
     }
 
     private final String url = "https://raw.githubusercontent.com/ronenvek/Alias/refs/heads/main/words";

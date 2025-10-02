@@ -21,7 +21,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ronen.alias.util.DataBase;
 import com.ronen.alias.util.ListAdapter;
 import com.ronen.alias.R;
 import com.ronen.alias.util.SoundHelper;
@@ -33,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WordScreen extends AppCompatActivity {
 
-	TextView word;
+    TextView word;
     TextView amount;
     TextView timer;
     ImageButton back;
@@ -66,7 +65,7 @@ public class WordScreen extends AppCompatActivity {
         correct = 0;
         wrong = 0;
 
-	    word = findViewById(R.id.text);
+        word = findViewById(R.id.text);
         timer = findViewById(R.id.timer);
         amount = findViewById(R.id.amount);
         back = findViewById(R.id.back);
@@ -75,7 +74,6 @@ public class WordScreen extends AppCompatActivity {
 
 
         back.setOnClickListener(v -> {
-            DataBase.setGuesser(false);
             Util.switchActivities(StartScreen.class);
             stop();
         });
@@ -85,16 +83,12 @@ public class WordScreen extends AppCompatActivity {
 
         timeleft = 60 * 1000;
 
-        DataBase.getStart(v -> {
-            timeleft = 60 * 1000 - (int)(System.currentTimeMillis() - v);
-        });
-
         final int timerSpeed = 100;
         toStop = false;
 
         Context ctx = this;
 
-         timerRunnable = new Runnable() {
+        timerRunnable = new Runnable() {
             @Override
             public void run() {
                 if (toStop || !Util.context.equals(ctx)){
@@ -130,24 +124,18 @@ public class WordScreen extends AppCompatActivity {
                 timer.setText(String.valueOf(seconds));
                 handler.postDelayed(this, timerSpeed);
             }
-         };
+        };
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ListAdapter(data, true, v -> DataBase.putData("badwords", v, true));
+        adapter = new ListAdapter(data, false, v -> {});
         recyclerView.setAdapter(adapter);
 
         handler.post(timerRunnable);
 
         showWord();
         updateAmount();
-
-        DataBase.getAmount(r -> {
-            correct = r[0];
-            wrong = r[1];
-            updateAmount();
-        });
     }
 
     public static List<String> words;
@@ -188,9 +176,9 @@ public class WordScreen extends AppCompatActivity {
             return;
 
         if (right)
-            DataBase.putData("game", "correct", ++correct);
+            correct++;
         else
-            DataBase.putData("game", "wrong", ++wrong);
+            wrong++;
 
         updateAmount();
 
@@ -199,7 +187,6 @@ public class WordScreen extends AppCompatActivity {
 
     private void showWord(){
         if (words == null || words.isEmpty()){
-            DataBase.setGuesser(false);
             Util.switchActivities(StartScreen.class);
             return;
         }
